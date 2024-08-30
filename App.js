@@ -1,10 +1,55 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { Button, StyleSheet, Text, View } from 'react-native';
+import * as Notifications from 'expo-notifications';
+import { useEffect } from 'react';
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => {
+    return {
+      shouldPlaySound: false,
+      shouldSetBadge: false,
+      shouldShowAlert: true,
+    };
+  }
+});
 
 export default function App() {
+
+  useEffect(() => {
+    (async () => {
+      const { status } = await Notifications.requestPermissionsAsync();
+      if (status !== "granted") {
+        alert("Permission to show notifications has not been granted.");
+      }
+    })();
+  }, []);
+
+  async function scheduleNotificationHandler() {
+    try {
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: 'Hello World!',
+          body: 'I am a notification!!!',
+          data: { userName: 'Yoko' },
+          sound: true, // Add sound
+          priority: Notifications.AndroidNotificationPriority.HIGH,
+        },
+        trigger: {
+          seconds: 1,
+        },
+      });
+      console.log('Notification scheduled successfully');
+    } catch (error) {
+      console.error('Error scheduling notification:', error);
+    }
+  }
+
   return (
     <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
+      <Button 
+        title='First Notification' 
+        onPress={scheduleNotificationHandler}
+      />
       <StatusBar style="auto" />
     </View>
   );
