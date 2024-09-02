@@ -14,6 +14,29 @@ Notifications.setNotificationHandler({
 });
 
 export default function App() {
+  useEffect(() => {
+    const subscriptionAndroid = Notifications.addNotificationReceivedListener((notification) => {
+      console.log('NOTIFICATION RECEIVED');
+      console.log(notification);
+      const userName = notification.request.content.data.userName;
+      console.log(userName);
+
+    });
+
+    const subscriptionIOS = Notifications.addNotificationResponseReceivedListener((response) => {
+      console.log('NOTIFICATION RESPONSE RECEIVED');
+      console.log(response);
+      const userName = response.notification.request.content.data.userName;
+      console.log(userName);
+    });
+
+    return () => {
+      subscriptionAndroid.remove();
+      subscriptionIOS.remove();
+    }
+
+  }, []);
+
 
   useEffect(() => {
     (async () => {
